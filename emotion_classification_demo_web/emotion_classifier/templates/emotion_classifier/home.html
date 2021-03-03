@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  <script src="https://unpkg.com/react@17/umd/react.development.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@17/umd/react-dom.development.js" crossorigin></script>
+  <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/css/all.min.css">
+
+  <script type="text/babel">
+
+    const e = React.createElement;
+
+    class EmotionPredictor extends React.Component {
+      constructor(props) {
+        super(props);
+        this.state = { input: '', results: [] };
+      }
+
+      emotionMapper = {
+          sadness: (<i className="fas fa-sad-tear"></i>),
+          anger:(<i className="fas fa-angry"></i>),
+          fear:(<i className="fas fa-frown-open"></i>),
+          joy: (<i className="fas fa-grin-tears"></i>),
+          love:(<i className="fas fa-grin-hearts"></i>),
+          surprise:(<i className="fas fa-surprise"></i>)
+      }
+
+      render() {
+        return (
+          <div>
+            <form onSubmit={(e) => {
+              e.preventDefault();
+              fetch('http://localhost:8000/predict_emotion', 
+              {
+                method: 'POST',
+                mode: 'cors',
+                headers: {
+                  'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: `input=${this.state.input}`
+              })
+                .then(response => response.json())
+                .then(json => this.setState({ ...this.state, results:[...this.state.results, { input: this.state.input, emotion: json.emotion, emoji: this.emotionMapper[json.emotion] }] }));
+            }}>
+              <p>Input: </p>
+              <input name="input" value={this.state.input} type="text" onChange={(e) => this.setState({ ...this.state, input: e.target.value})}/>
+              <button type="submit">Submit</button>
+            </form>
+            <div>Results:</div>
+            {this.state.results.map((_r, i) => <div key={i}> {i+1}: {_r.input}: {_r.emotion} {_r.emoji}</div>)}
+          </div>
+        )
+      }
+    }
+
+    const domContainer = document.querySelector('#root');
+    ReactDOM.render(e(EmotionPredictor), domContainer);
+  </script>
+  
+  <div id="root"></div>
+  
+</body>
+</html>
