@@ -2,8 +2,8 @@ Prerequisites: nltk, sklearn, django
 
 1. Script to train, validate and generate test result
 
-###cd emotion_classification
-###python3 main.py
+cd emotion_classification
+python3 main.py
 
 
 2. Startup web UI server
